@@ -110,7 +110,7 @@ class TextAnalyzer extends Component {
             .then(data => {
                 const tempObj = data.entries.map(item => item.text);
                 const postObj = tempObj.join(' ')
-                axios.post('http://134.209.163.8:5000/analyze', { postObj })
+                axios.post('/api/sentiments/analyze', { postObj })
                     .then(response => response.data)
                     .then(nlpData => {
                         const topicUpload = {
@@ -145,7 +145,7 @@ class TextAnalyzer extends Component {
             .then(data => {
                 const tempObj = data.entries.map(item => item.text);
                 const postObj = tempObj.join(' ')
-                axios.post('http://134.209.163.8:5000/sentiment', { postObj })
+                axios.post('/api/sentiments/sentiment', { postObj })
                     .then(response => response.data)
                     .then(nlpData => {
                         nlpData.entries = data.entries;
