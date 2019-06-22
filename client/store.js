@@ -73,14 +73,25 @@ const weatherApiCall = location => {
     }
 };
 
+const locationCall = ip => {
+    return dispatch => {
+        return axios
+            .post('/api/locations/currentlocation', ip)
+                .then(response => response.data)
+                .then(location => {
+                    dispatch(setLocation(location));
+                    dispatch(weatherApiCall(location));
+                })
+    }
+}
+
 const ipLocationCall = () => {
     return dispatch => {
         return axios
-            .get('http://ip-api.com/json/')
+            .get('https://api.ipify.org?format=json')
             .then(response => response.data)
             .then(data => {
-                dispatch(setLocation(data));
-                dispatch(weatherApiCall(data));
+                dispatch(locationCall(data))
             })
             .catch(error => console.log(error));
     };

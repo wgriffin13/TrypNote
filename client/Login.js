@@ -37,7 +37,7 @@ class Login extends Component {
             .then(success => {
                 if (success === true) {
                     this.props.requestIpLocationCall();
-                    this.props.history.push('/home');
+                    //this.props.history.push('/home');
                 } else {
                     console.log('Wrong email and password')
                 }
