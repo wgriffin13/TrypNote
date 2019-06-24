@@ -10,7 +10,6 @@ router.get('/', (req, res, next) => {
 
 router.post('/analyze', (req, res, next) => {
     const postObj = req.body;
-    console.log(postObj);
     axios.post('http://134.209.163.8:5000/analyze', postObj)
         .then(response => response.data)
         .then(data => {
@@ -21,7 +20,6 @@ router.post('/analyze', (req, res, next) => {
 
 router.post('/sentiment', (req, res, next) => {
     const postObj = req.body;
-    console.log(postObj);
     axios.post('http://134.209.163.8:5000/sentiment', postObj)
         .then(response => response.data)
         .then(data => {
