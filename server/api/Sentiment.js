@@ -12,16 +12,22 @@ router.get('/', (req, res, next) => {
 router.post('/stream/analyze', (req, res, next) => {
     const postObj = req.body;
     const source = new EventSource('http://134.209.163.8:5000/stream');
+    res.writeHead(200, {
+        'Content-Type': 'text/event-stream',
+        'Cache-Control': 'no-cache',
+        'Connection': 'keep-alive',
+    });
     source.addEventListener('status', event => {
         const data = JSON.parse(event.data);
         console.log("SSE: " + data.message);
+        res.write(data.message);
     }, false);
     source.addEventListener('error', event => {
         source.close()
     }, false);
     source.addEventListener('results', event => {
         console.log("These are the results: " + JSON.parse(event.data))
-        res.send(event.data)
+        res.write(event.data);
     }, false)
     setTimeout(() => axios.post('http://134.209.163.8:5000/analyze', postObj).then(response => console.log(response.data)).catch(next), 100);
 })

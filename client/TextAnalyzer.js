@@ -110,28 +110,28 @@ class TextAnalyzer extends Component {
             .then(data => {
                 const tempObj = data.entries.map(item => item.text);
                 const postObj = tempObj.join(' ')
-                axios.post('/api/sentiments/stream/analyze', { postObj })
-                    .then(response => response.data)
-                    .then(nlpData => {
-                        const topicUpload = {
-                            topics: JSON.parse(nlpData.results),
-                            entries: data.entries
-                        }
-                        console.log(JSON.parse(nlpData.results))
-                        axios.post(`/api/topics/${userId}`, topicUpload)
-                            .then(response => response.data)
-                            .then((textAnalyze) => {
-                                axios.get(`/api/topics/${userId}/textanalyze/${textAnalyze.id}`)
-                                    .then(resTopics => {
-                                        textId = textAnalyze.id
-                                        this.setState({ analyzerResponse: resTopics.data, engineRunning: false })
-                                    })
-                                    .catch(error => console.log(error))
-                            })
-                            .catch(error => console.log(error));
-                    })
+                
             })
-        return textId
+        return
+    }
+
+    runTopicUpload (nlpData, data, userId) {
+        const topicUpload = {
+            topics: JSON.parse(nlpData.results),
+            entries: data.entries
+        }
+        console.log(JSON.parse(nlpData.results))
+        axios.post(`/api/topics/${userId}`, topicUpload)
+            .then(response => response.data)
+            .then((textAnalyze) => {
+                axios.get(`/api/topics/${userId}/textanalyze/${textAnalyze.id}`)
+                    .then(resTopics => {
+                        // textId = textAnalyze.id
+                        this.setState({ analyzerResponse: resTopics.data, engineRunning: false })
+                    })
+                    .catch(error => console.log(error))
+            })
+            .catch(error => console.log(error));
     }
 
     runSentiment = () => {
@@ -206,10 +206,20 @@ class TextAnalyzer extends Component {
         this.runSentiment()
     }
 
-    testSSE = () => {
-        console.log('TEST SSE')
-        axios.get('http://134.209.163.8:5000/hello')
-            .then(res => console.log(res.data))
+    testSSE = (postObj) => {
+        const source = new EventSource('http://134.209.163.8:5000/stream');
+        source.addEventListener('status', event => {
+            const data = JSON.parse(event.data);
+            console.log("SSE: " + data.message);
+        }, false);
+        source.addEventListener('error', event => {
+            source.close()
+        }, false);
+        source.addEventListener('results', event => {
+            console.log("These are the results: " + JSON.parse(event.data))
+            res.send(event.data)
+        }, false)
+        setTimeout(() => axios.post('http://134.209.163.8:5000/analyze', postObj).then(response => console.log(response.data)).catch(next), 100);
     }
 
     render() {
