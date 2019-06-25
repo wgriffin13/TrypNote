@@ -1,12 +1,30 @@
 const router = require('express').Router();
 const { Sentiment, Entry } = require('../db/models');
 const axios = require('axios');
+const EventSource = require('eventsource')
 
 router.get('/', (req, res, next) => {
     Sentiment.findAll()
         .then(data => res.send(data))
         .catch(next);
 });
+
+router.post('/stream/analyze', (req, res, next) => {
+    const postObj = req.body;
+    const source = new EventSource('http://134.209.163.8:5000/stream');
+    source.addEventListener('status', event => {
+        const data = JSON.parse(event.data);
+        console.log("SSE: " + data.message);
+    }, false);
+    source.addEventListener('error', event => {
+        source.close()
+    }, false);
+    source.addEventListener('results', event => {
+        console.log("These are the results: " + JSON.parse(event.data))
+        res.send(event.data)
+    }, false)
+    setTimeout(() => axios.post('http://134.209.163.8:5000/analyze', postObj).then(response => console.log(response.data)).catch(next), 100);
+})
 
 router.post('/analyze', (req, res, next) => {
     const postObj = req.body;

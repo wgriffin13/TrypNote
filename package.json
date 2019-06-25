@@ -37,6 +37,7 @@
     "cookie-parser": "^1.4.4",
     "date-fns": "^2.0.0-alpha.34",
     "dateformat": "^3.0.3",
+    "eventsource": "^1.0.7",
     "express": "^4.17.0",
     "express-session": "^1.16.1",
     "faker": "^4.1.0",

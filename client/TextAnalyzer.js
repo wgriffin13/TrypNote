@@ -98,17 +98,6 @@ class TextAnalyzer extends Component {
         }
     }
 
-    componentDidMount() {
-        const source = new EventSource('http://134.209.163.8:5000/stream');
-        source.addEventListener('status', event => {
-            const data = JSON.parse(event.data);
-            console.log("SSE: " + data.message);
-        }, false);
-        source.addEventListener('error', event => {
-            source.close()
-        }, false);
-    }
-
     runTextAnalyzer = () => {
         this.setState({ engineRunning: true })
         // Need to make dynamic
@@ -121,7 +110,7 @@ class TextAnalyzer extends Component {
             .then(data => {
                 const tempObj = data.entries.map(item => item.text);
                 const postObj = tempObj.join(' ')
-                axios.post('/api/sentiments/analyze', { postObj })
+                axios.post('/api/sentiments/stream/analyze', { postObj })
                     .then(response => response.data)
                     .then(nlpData => {
                         const topicUpload = {
