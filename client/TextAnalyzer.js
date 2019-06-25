@@ -98,6 +98,17 @@ class TextAnalyzer extends Component {
         }
     }
 
+    componentDidMount() {
+        const source = new EventSource('http://134.209.163.8:5000/stream');
+        source.addEventListener('status', event => {
+            const data = JSON.parse(event.data);
+            console.log("SSE: " + data.message);
+        }, false);
+        source.addEventListener('error', event => {
+            source.close()
+        }, false);
+    }
+
     runTextAnalyzer = () => {
         this.setState({ engineRunning: true })
         // Need to make dynamic
@@ -124,7 +135,7 @@ class TextAnalyzer extends Component {
                                 axios.get(`/api/topics/${userId}/textanalyze/${textAnalyze.id}`)
                                     .then(resTopics => {
                                         textId = textAnalyze.id
-                                        this.setState({ analyzerResponse: resTopics.data })
+                                        this.setState({ analyzerResponse: resTopics.data, engineRunning: false })
                                     })
                                     .catch(error => console.log(error))
                             })
@@ -168,7 +179,6 @@ class TextAnalyzer extends Component {
                                     }
                                 });
                                 newStateObj.emotion = maxEmotion.emotion;
-                                newStateObj.engineRunning = false;
                                 // Prominent emotion
                                 console.log(data);
                                 this.setState(newStateObj);
@@ -205,6 +215,12 @@ class TextAnalyzer extends Component {
     runNLP = () => {
         this.runTextAnalyzer()
         this.runSentiment()
+    }
+
+    testSSE = () => {
+        console.log('TEST SSE')
+        axios.get('http://134.209.163.8:5000/hello')
+            .then(res => console.log(res.data))
     }
 
     render() {
